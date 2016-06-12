@@ -21,8 +21,9 @@ var Comment = React.createClass({
         var reply;
         if (this.props.comment.replyContent) {
             reply = (<div className="comment">
-                <span
-                    className="commentReplyAuthor"> {this.props.comment.replyAuthor} 回复 {this.props.comment.author}</span>
+                <span className="commentReplyAuthor">{this.props.comment.replyAuthor}</span>
+                <span className="commentReplyAuthor" style={{padding: "0 0 0 5px",color:"#D2D2D2",fontSize:"1.1em"}}>回复</span>
+                <span className="commentReplyAuthor" style={{padding: "0 0 0 5px"}}>{this.props.comment.author}</span>
                 <br />
                 <span className="commentReplyTime">{this.props.comment.replyAt}</span>
                 <br />
@@ -79,79 +80,6 @@ var CommentBox = React.createClass({
             console.log(this.url);
         },
 
-        dyniframesize: function () {
-            var Sys = {};
-            var ua = navigator.userAgent.toLowerCase();
-            var s;
-            (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
-                (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
-                    (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
-                        (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
-                            (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
-            var pTar = null;
-            if (document.getElementById) {
-                pTar = document.getElementById("iFrame");
-            } else {
-                eval('pTar=' + down + ';');
-            }
-            console.log(pTar);
-            if (!pTar) {
-                return
-            }
-            pTar.style.display = "block";
-
-            if (Sys.ie) {
-                if (Sys.ie == '9.0') {
-                    pTar.height = pTar.contentWindow.document.body.offsetHeight + 15 + "px";
-                    pTar.width = pTar.contentWindow.document.body.scrollWidth + "px";
-                } else if (Sys.ie == '8.0') {
-                    pTar.height = pTar.Document.body.offsetHeight + 15 + "px";
-                    pTar.width = pTar.Document.body.scrollWidth + "px";
-                } else {
-                    pTar.height = pTar.Document.body.scrollHeight + 25 + "px";
-                    pTar.width = pTar.Document.body.scrollWidth + "px";
-                }
-                console.log("ie");
-            }
-            if (Sys.firefox) {
-                pTar.height = pTar.contentDocument.body.offsetHeight + 15 + "px";
-                pTar.width = pTar.contentDocument.body.scrollWidth + "px";
-                console.log("firefox");
-            }
-            if (Sys.chrome) {
-                pTar.height = pTar.contentDocument.body.offsetHeight;
-                pTar.width = pTar.contentDocument.body.scrollWidth;
-                console.log("chrome");
-            }
-            if (Sys.opera) {
-                pTar.height = pTar.contentDocument.body.offsetHeight;
-                pTar.width = pTar.contentDocument.body.scrollWidth;
-                console.log("opera");
-            }
-            if (Sys.safari) {
-                console.log(window.innerHeight);
-                pTar.height = window.innerHeight;
-                pTar.width = pTar.contentDocument.body.scrollWidth;
-                console.log("safari");
-            }
-        },
-
-        reinitIframe: function () {
-            var iframe = document.getElementById("iFrame");
-            iframe.height = 2000;
-            console.log(iframe);
-            try {
-                var bHeight = iframe.contentWindow.document.body.scrollHeight;
-                var dHeight = iframe.contentWindow.document.documentElement.scrollHeight;
-                var height = Math.max(bHeight, dHeight);
-                iframe.height = height;
-                console.log(iframe.height);
-            } catch (ex) {
-                console.log(ex);
-                console.log(iframe.height);
-            }
-        },
-
         handleCommentSubmit: function (comment) {
             var comments = this.state.data;
             comment.id = Date.now();
@@ -170,18 +98,17 @@ var CommentBox = React.createClass({
                     console.error(this.props.url, status, err.toString());
                 }.bind(this)
             });
-        }
-        ,
+        },
+
         getInitialState: function () {
             return {data: []};
-        }
-        ,
+        },
+
         componentDidMount: function () {
             this.getUrlParam();
             this.loadCommentsFromServer();
-            this.reinitIframe();
-            //setInterval(this.reinitIframe, 2000);
         },
+
         render: function () {
             return (
                 <div className="commentBox">
@@ -194,6 +121,11 @@ var CommentBox = React.createClass({
                     <CommentList data={this.state.data}/>
                     <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
                     <span className="commentFoot"></span>
+
+                    <div style={{width:"100%",height:54}}></div>
+
+                    <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
+                    <div style={{position:"fixed",bottom:0,width:"100%",height:55,backgroundColor:"#FFFFFF",border:0}}></div>
                 </div>
             );
         }
@@ -212,6 +144,7 @@ var CommentList = React.createClass({
         });
         return (
             <div className="commentList">
+                {commentNodes}
                 {commentNodes}
             </div>
         );
