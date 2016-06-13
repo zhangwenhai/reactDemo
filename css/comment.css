@@ -148,10 +148,39 @@ br {
     padding: 0 0 0 0;
     background-color: #FBFBFB;
     width: 100%;
+    height: 45px;
     display: inline-block;
-    height: 20px;
-    font-size: 1.0em;
-    border-bottom: 1px solid #ddd;
+    font-size: 1.2em;
     text-align: center;
-    align-items: baseline;
+    line-height: 45px;
+    color: #39A7F7;
+}
+
+.commentSubmit {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 55px;
+    background-color: #F8F8F8;
+    border: 0;
+    display: flex;
+    display: -webkit-flex; /* Safari */
+    flex-direction: row;
+    align-items: center;
+}
+
+.commentInput {
+    margin: 0 10px 0 10px;
+    padding: 0 0 0 5px;
+    height: 30px;
+    border-width: 0;
+    flex: 1;
+}
+
+.commentPost {
+    margin: 0 10px 0 0;
+    padding: 0 0 0 0;
+    height: 30px;
+    text-align: right;
+    width: 50px;
 }

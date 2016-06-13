@@ -48,89 +48,95 @@ var Comment = React.createClass({
 });
 
 var CommentBox = React.createClass({
-        loadCommentsFromServer: function () {
-            $.ajax({
-                url: this.url,
-                dataType: 'json',
-                type: 'post',
-                cache: false,
-                success: function (data) {
-                    console.log(data);
-                    this.setState({data: data.data});
-                }.bind(this),
-                error: function (xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-                }.bind(this)
-            });
-        },
+    loadCommentsFromServer: function () {
+        $.ajax({
+            url: this.url,
+            dataType: 'json',
+            type: 'post',
+            cache: false,
+            success: function (data) {
+                console.log(data);
+                this.setState({data: data.data});
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
 
-        getUrlParam: function () {
-            var urlParams;
-            var match,
-                pl = /\+/g,  // Regex for replacing addition symbol with a space
-                search = /([^&=]+)=?([^&]*)/g,
-                decode = function (s) {
-                    return decodeURIComponent(s.replace(pl, " "));
-                },
-                query = window.location.search.substring(1);
-            urlParams = {};
-            while (match = search.exec(query))
-                urlParams[decode(match[1])] = decode(match[2]);
-            this.url = "/v3/topic/detail?id=" + urlParams["id"];
-            console.log(this.url);
-        },
+    getUrlParam: function () {
+        var urlParams;
+        var match,
+            pl = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) {
+                return decodeURIComponent(s.replace(pl, " "));
+            },
+            query = window.location.search.substring(1);
+        urlParams = {};
+        while (match = search.exec(query))
+            urlParams[decode(match[1])] = decode(match[2]);
+        this.url = "/v3/topic/detail?id=" + urlParams["id"];
+        console.log(this.url);
+    },
 
-        handleCommentSubmit: function (comment) {
-            var comments = this.state.data;
-            comment.id = Date.now();
-            var newComments = comments.concat([comment]);
-            this.setState({data: newComments});
-            $.ajax({
-                url: this.props.url,
-                dataType: 'json',
-                type: 'POST',
-                data: comment,
-                success: function (data) {
-                    this.setState({data: data});
-                }.bind(this),
-                error: function (xhr, status, err) {
-                    this.setState({data: comments});
-                    console.error(this.props.url, status, err.toString());
-                }.bind(this)
-            });
-        },
+    handleCommentSubmit: function (comment) {
+        var comments = this.state.data;
+        comment.id = Date.now();
+        var newComments = comments.concat([comment]);
+        this.setState({data: newComments});
+        $.ajax({
+            url: this.props.url,
+            dataType: 'json',
+            type: 'POST',
+            data: comment,
+            success: function (data) {
+                this.setState({data: data});
+            }.bind(this),
+            error: function (xhr, status, err) {
+                this.setState({data: comments});
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
 
-        getInitialState: function () {
-            return {data: []};
-        },
+    getInitialState: function () {
+        return {data: []};
+    },
 
-        componentDidMount: function () {
-            this.getUrlParam();
-            this.loadCommentsFromServer();
-        },
+    componentDidMount: function () {
+        this.getUrlParam();
+        this.loadCommentsFromServer();
+    },
+    //<CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+    render: function () {
+        return (
+            <div className="commentBox">
+                <div className="commentLine"/>
+                <span className="commentHead">评论: {this.state.data.commentCount}</span>
 
-        render: function () {
-            return (
-                <div className="commentBox">
-                    <div className="commentLine"/>
-                    <span className="commentHead">评论: {this.state.data.commentCount}</span>
+                <div className="commentLine"/>
 
-                    <div className="commentLine"/>
+                <div className="commentHead_1"></div>
+                <CommentList data={this.state.data}/>
 
-                    <div className="commentHead_1"></div>
-                    <CommentList data={this.state.data}/>
-                    <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
-                    <span className="commentFoot"></span>
+                <span className="commentFoot">查看全部评论</span>
 
-                    <div style={{width:"100%",height:54}}></div>
+                <div style={{width:"100%",height:54}}></div>
+                <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
+                <div className="commentSubmit">
 
-                    <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
-                    <div style={{position:"fixed",bottom:0,width:"100%",height:55,backgroundColor:"#FFFFFF",border:0}}></div>
+                    <input className="commentInput"
+                           type="text"
+                           placeholder="Your name"
+                           value={this.state.author}
+                           onChange={this.handleAuthorChange}/>
+                    <input className="commentPost" type="submit" value="Post"/>
                 </div>
-            );
-        }
-    })
-    ;
+            </div>
+        );
+    }
+});
 
 var CommentList = React.createClass({
     render: function () {
