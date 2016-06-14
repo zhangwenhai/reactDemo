@@ -2,13 +2,37 @@
   "name": "react-tutorial-master",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "example.js",
   "scripts": {
-    "dev": "browser-sync start --server --files *.*"
+    "b": "webpack",
+    "dev": "browser-sync start --server --files *.*",
+    "dev1": "webpack-dev-server --devtool eval --progress --colors --hot --content-base build"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "browser-sync": "^2.12.12"
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "whatwg-fetch": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.9.1",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-1": "^6.5.0",
+    "browser-sync": "^2.12.12",
+    "css-loader": "^0.23.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react",
+      "stage-1"
+    ],
+    "plugins": []
   }
 }

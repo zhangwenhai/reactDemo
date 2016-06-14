@@ -9,6 +9,10 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'whatwg-fetch';
+import "./comment";
 
 var Comment = React.createClass({
     rawMarkup: function () {
@@ -49,35 +53,55 @@ var Comment = React.createClass({
 
 var CommentBox = React.createClass({
     loadCommentsFromServer: function () {
-        $.ajax({
-            url: this.url,
-            dataType: 'json',
-            type: 'post',
-            cache: false,
-            success: function (data) {
-                console.log(data);
-                this.setState({data: data.data});
-            }.bind(this),
-            error: function (xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-            }.bind(this)
-        });
+        //$.ajax({
+        //    url: this.url,
+        //    dataType: 'json',
+        //    type: 'post',
+        //    cache: false,
+        //    success: function (data) {
+        //        console.log(data);
+        //        this.setState({data: data.data});
+        //    }.bind(this),
+        //    error: function (xhr, status, err) {
+        //        console.error(this.props.url, status, err.toString());
+        //    }.bind(this)
+        //});
+        fetch(this.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                console.log(responseData);
+                this.setState({data: responseData.data});
+            })
+            .catch(error => {
+                //console.error(this.props.url, status, error.toString());
+            });
+
     },
 
     getUrlParam: function () {
-        var urlParams;
-        var match,
-            pl = /\+/g,  // Regex for replacing addition symbol with a space
-            search = /([^&=]+)=?([^&]*)/g,
-            decode = function (s) {
-                return decodeURIComponent(s.replace(pl, " "));
-            },
-            query = window.location.search.substring(1);
-        urlParams = {};
-        while (match = search.exec(query))
-            urlParams[decode(match[1])] = decode(match[2]);
-        this.url = "/v3/topic/detail?id=" + urlParams["id"];
+        this.url = "/v3/topic/detail?id=" + window.topic_id;
+        //var urlParams;
+        //var match,
+        //    pl = /\+/g,  // Regex for replacing addition symbol with a space
+        //    search = /([^&=]+)=?([^&]*)/g,
+        //    decode = function (s) {
+        //        return decodeURIComponent(s.replace(pl, " "));
+        //    },
+        //    query = window.location.search.substring(1);
+        //urlParams = {};
+        //while (match = search.exec(query))
+        //    urlParams[decode(match[1])] = decode(match[2]);
+        //this.url = "/v3/topic/detail?id=" + urlParams["id"];
         console.log(this.url);
+    },
+
+    getUrlParam1: function () {
+        location.href = 'http://www.baidu.com';
     },
 
     handleCommentSubmit: function (comment) {
@@ -108,7 +132,7 @@ var CommentBox = React.createClass({
         this.getUrlParam();
         this.loadCommentsFromServer();
     },
-    //<CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+
     render: function () {
         return (
             <div className="commentBox">
@@ -120,19 +144,11 @@ var CommentBox = React.createClass({
                 <div className="commentHead_1"></div>
                 <CommentList data={this.state.data}/>
 
-                <span className="commentFoot">查看全部评论</span>
+                <span className="commentFoot" onClick={this.getUrlParam1}>查看全部评论</span>
 
                 <div style={{width:"100%",height:54}}></div>
                 <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
-                <div className="commentSubmit">
-
-                    <input className="commentInput"
-                           type="text"
-                           placeholder="Your name"
-                           value={this.state.author}
-                           onChange={this.handleAuthorChange}/>
-                    <input className="commentPost" type="submit" value="Post"/>
-                </div>
+                <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
             </div>
         );
     }
@@ -151,7 +167,6 @@ var CommentList = React.createClass({
         return (
             <div className="commentList">
                 {commentNodes}
-                {commentNodes}
             </div>
         );
     }
@@ -159,46 +174,40 @@ var CommentList = React.createClass({
 
 var CommentForm = React.createClass({
     getInitialState: function () {
-        return {author: '', text: ''};
-    },
-    handleAuthorChange: function (e) {
-        this.setState({author: e.target.value});
+        return {text: ''};
     },
     handleTextChange: function (e) {
         this.setState({text: e.target.value});
     },
     handleSubmit: function (e) {
         e.preventDefault();
-        var author = this.state.author.trim();
         var text = this.state.text.trim();
-        if (!text || !author) {
+        if (!text) {
             return;
         }
-        this.props.onCommentSubmit({author: author, text: text});
-        this.setState({author: '', text: ''});
+        this.props.onCommentSubmit({text: text});
+        this.setState({text: ''});
     },
     render: function () {
         return (
             <form className="commentForm" onSubmit={this.handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Your name"
-                    value={this.state.author}
-                    onChange={this.handleAuthorChange}
-                    />
-                <input
-                    type="text"
-                    placeholder="Say something..."
-                    value={this.state.text}
-                    onChange={this.handleTextChange}
-                    />
-                <input type="submit" value="Post"/>
+                <div className="commentSubmit">
+                    <input className="commentInput"
+                           type="text"
+                           placeholder="Say something..."
+                           value={this.state.text}
+                           onChange={this.handleTextChange}/>
+                    <input className="commentPost" type="submit" value="Post"/>
+                </div>
             </form>
         );
     }
 });
 
-ReactDOM.render(
-    <CommentBox />,
-    document.getElementById('content')
-);
+window.onload = function () {
+    ReactDOM.render(
+        <CommentBox />,
+        document.getElementById('detail_comment')
+    );
+}
+
