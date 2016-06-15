@@ -21,6 +21,24 @@ var Comment = React.createClass({
         return {__html: rawMarkup};
     },
 
+    getShowTime: function (time1) {
+        var time = time1 * 1000;
+        var date = new Date(time);
+        if (this.props.date.getTime() - time < 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000) + "秒之前";
+        }
+        if (this.props.date.getTime() - time < 15 * 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000 / 60) + "分钟之前";
+        }
+        if (this.props.date.getTime() - time < 24 * 60 * 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000 / 60 / 60) + "小时之前";
+        }
+        var DD = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
+        var HH = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        var MM = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+        return date.getMonth() + "月" + DD + "日  " + HH + ":" + MM;
+    },
+
     render: function () {
         var reply;
         if (this.props.comment.replyContent) {
@@ -29,7 +47,7 @@ var Comment = React.createClass({
                 <span className="commentReplyAuthor" style={{padding: "0 0 0 5px",color:"#D2D2D2",fontSize:"1.1em"}}>回复</span>
                 <span className="commentReplyAuthor" style={{padding: "0 0 0 5px"}}>{this.props.comment.author}</span>
                 <br />
-                <span className="commentReplyTime">{this.props.comment.replyAt}</span>
+                <span className="commentReplyTime">{this.getShowTime(this.props.comment.replyAt)}</span>
                 <br />
                 <span className="commentReplyText">{this.props.comment.replyContent}</span>
 
@@ -40,7 +58,7 @@ var Comment = React.createClass({
             <div className="comment">
                 <span className="commentAuthor"> {this.props.comment.author} </span>
                 <br />
-                <span className="commentTime">{this.props.comment.time}</span>
+                <span className="commentTime">{this.getShowTime(this.props.comment.time)}</span>
                 <br />
                 <span className="commentText">{this.props.comment.content}</span>
 
@@ -53,19 +71,6 @@ var Comment = React.createClass({
 
 var CommentBox = React.createClass({
     loadCommentsFromServer: function () {
-        //$.ajax({
-        //    url: this.url,
-        //    dataType: 'json',
-        //    type: 'post',
-        //    cache: false,
-        //    success: function (data) {
-        //        console.log(data);
-        //        this.setState({data: data.data});
-        //    }.bind(this),
-        //    error: function (xhr, status, err) {
-        //        console.error(this.props.url, status, err.toString());
-        //    }.bind(this)
-        //});
         fetch(this.url, {
             method: 'POST',
             headers: {
@@ -78,25 +83,11 @@ var CommentBox = React.createClass({
                 this.setState({data: responseData.data});
             })
             .catch(error => {
-                //console.error(this.props.url, status, error.toString());
             });
-
     },
 
     getUrlParam: function () {
         this.url = "/v3/topic/detail?id=" + window.topic_id;
-        //var urlParams;
-        //var match,
-        //    pl = /\+/g,  // Regex for replacing addition symbol with a space
-        //    search = /([^&=]+)=?([^&]*)/g,
-        //    decode = function (s) {
-        //        return decodeURIComponent(s.replace(pl, " "));
-        //    },
-        //    query = window.location.search.substring(1);
-        //urlParams = {};
-        //while (match = search.exec(query))
-        //    urlParams[decode(match[1])] = decode(match[2]);
-        //this.url = "/v3/topic/detail?id=" + urlParams["id"];
         console.log(this.url);
     },
 
@@ -156,12 +147,13 @@ var CommentBox = React.createClass({
 
 var CommentList = React.createClass({
     render: function () {
+        var data = new Date();
         if (!this.props.data.comments) {
             return null;
         }
         var commentNodes = this.props.data.comments.map(function (comment, index) {
             return (
-                <Comment key={comment.id} comment={comment}/>
+                <Comment key={comment.id} comment={comment} date={data}/>
             );
         });
         return (
