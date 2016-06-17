@@ -84,11 +84,11 @@ br {
 }
 
 .commentAuthor {
-    margin: 8px 0 4px 0;
     padding: 0 0 0 8px;
     font-size: 1.2em;
     color: #5F5F5F;
     display: inline-block;
+    flex: 1;
 }
 
 .commentTime {
@@ -183,4 +183,28 @@ br {
     height: 30px;
     text-align: right;
     width: 50px;
+}
+
+.commentZan {
+    border-width: 0;
+    width: 23px;
+    height: 23px;
+    background-image: url("../image/zan_icon.png");
+    background-size: cover;
+}
+
+.commentZan_push {
+    border-width: 0;
+    width: 23px;
+    height: 23px;
+    background-image: url("../image/zan_icon_push.png");
+    background-size: cover;
+}
+
+.commentZan_1 {
+    margin-right: 8px;
+    padding-left: 2px;
+    font-size: 1.0em;
+    color: #5F5F5F;
+    display: inline-block;
 }

@@ -12,62 +12,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'whatwg-fetch';
-import "./comment";
-
-var Comment = React.createClass({
-    rawMarkup: function () {
-        var md = new Remarkable();
-        var rawMarkup = md.render(this.props.children.toString());
-        return {__html: rawMarkup};
-    },
-
-    getShowTime: function (time1) {
-        var time = time1 * 1000;
-        var date = new Date(time);
-        if (this.props.date.getTime() - time < 60 * 1000) {
-            return parseInt((this.props.date.getTime() - time) / 1000) + "秒之前";
-        }
-        if (this.props.date.getTime() - time < 60 * 60 * 1000) {
-            return parseInt((this.props.date.getTime() - time) / 1000 / 60) + "分钟之前";
-        }
-        if (this.props.date.getTime() - time < 24 * 60 * 60 * 1000) {
-            return parseInt((this.props.date.getTime() - time) / 1000 / 60 / 60) + "小时之前";
-        }
-        var DD = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
-        var HH = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-        var MM = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-        return date.getMonth() + "月" + DD + "日  " + HH + ":" + MM;
-    },
-
-    render: function () {
-        var reply;
-        if (this.props.comment.replyContent) {
-            reply = (<div className="comment">
-                <span className="commentReplyAuthor">{this.props.comment.replyAuthor}</span>
-                <span className="commentReplyAuthor" style={{padding: "0 0 0 5px",color:"#D2D2D2",fontSize:"1.1em"}}>回复</span>
-                <span className="commentReplyAuthor" style={{padding: "0 0 0 5px"}}>{this.props.comment.author}</span>
-                <br />
-                <span className="commentReplyTime">{this.getShowTime(this.props.comment.replyAt)}</span>
-                <br />
-                <span className="commentReplyText">{this.props.comment.replyContent}</span>
-
-                <div className="commentLine"/>
-            </div>)
-        }
-        return (
-            <div className="comment">
-                <span className="commentAuthor"> {this.props.comment.author} </span>
-                <br />
-                <span className="commentTime">{this.getShowTime(this.props.comment.time)}</span>
-                <br />
-                <span className="commentText">{this.props.comment.content}</span>
-
-                <div className={this.props.comment.replyContent ?"commentReplyLine":"commentLine"}/>
-                {reply}
-            </div>
-        );
-    }
-});
+import "../css/comment";
 
 var CommentBox = React.createClass({
     loadCommentsFromServer: function () {
@@ -130,7 +75,6 @@ var CommentBox = React.createClass({
             })
             .catch(error => {
             });
-
     },
 
     getInitialState: function () {
@@ -256,9 +200,9 @@ var CommentBox2 = React.createClass({
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 "auth-uid": auth_uid,
-                "auth-token": auth_token,
+                "auth-token": auth_token
             },
-            body: "content=" + comment.text,
+            body: "content=" + comment.text
         })
             .then((response) => response.json())
             .then((responseData) => {
@@ -296,6 +240,111 @@ var CommentList = React.createClass({
         return (
             <div className="commentList">
                 {commentNodes}
+            </div>
+        );
+    }
+});
+
+var Comment = React.createClass({
+    getInitialState: function () {
+        return {favorited: this.props.comment.favorited, favorites: this.props.comment.favorites};
+    },
+    rawMarkup: function () {
+        var md = new Remarkable();
+        var rawMarkup = md.render(this.props.children.toString());
+        return {__html: rawMarkup};
+    },
+
+    getShowTime: function (time1) {
+        var time = time1 * 1000;
+        var date = new Date(time);
+        if (this.props.date.getTime() - time < 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000) + "秒之前";
+        }
+        if (this.props.date.getTime() - time < 60 * 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000 / 60) + "分钟之前";
+        }
+        if (this.props.date.getTime() - time < 24 * 60 * 60 * 1000) {
+            return parseInt((this.props.date.getTime() - time) / 1000 / 60 / 60) + "小时之前";
+        }
+        var DD = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
+        var HH = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        var MM = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+        return date.getMonth() + "月" + DD + "日  " + HH + ":" + MM;
+    },
+
+    setFavorited: function () {
+        var strCookie = document.cookie;
+        var arrCookie = strCookie.split("; ");
+        var auth_uid;
+        var auth_token;
+        for (var i = 0; i < arrCookie.length; i++) {
+            var arr = arrCookie[i].split("=");
+            if ("auth-uid" == arr[0]) {
+                auth_uid = arr[1];
+            } else if ("auth-token" == arr[0]) {
+                auth_token = arr[1];
+            }
+        }
+        console.log(auth_uid);
+        console.log(auth_token);
+        fetch("/v3/topic/favourComment", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                "auth-uid": auth_uid,
+                "auth-token": auth_token,
+            },
+            body: "commentId=" + this.props.comment.id,
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                console.log(responseData);
+                this.setState({
+                    favorited: !this.state.favorited,
+                    favorites: this.state.favorited ? this.state.favorites - 1 : this.state.favorites + 1
+                });
+            })
+            .catch(error => {
+            });
+    },
+
+    render: function () {
+        var reply;
+        if (this.props.comment.replyContent) {
+            reply = (
+                <div style={{display:"flex",display:"-webkit-flex",flexDirection:"column"}}>
+                    <div style={{display:"flex",display:"-webkit-flex",flexDirection:"row",height:30,alignItems:"center",marginTop:5}}>
+                        <span className="commentReplyAuthor">{this.props.comment.replyAuthor}</span>
+
+                        <div style={{display:"flex",display:"-webkit-flex",flexDirection:"row",alignItems:"center",flex: 1}}>
+                            <span className="commentReplyAuthor" style={{padding: "0 0 0 5px",color:"#D2D2D2",fontSize:"1.1em"}}>回复</span>
+                            <span className="commentReplyAuthor" style={{padding: "0 0 0 5px",flex: 1}}>{this.props.comment.author}</span>
+                        </div>
+                    </div>
+                    <span className="commentReplyTime">{this.getShowTime(this.props.comment.replyAt)}</span>
+                    <span className="commentReplyText">{this.props.comment.replyContent}</span>
+
+                    <div className="commentLine"/>
+                </div>
+            )
+        }
+        return (
+            <div style={{display:"flex",display:"-webkit-flex",flexDirection:"column"}}>
+                <div style={{display:"flex",display:"-webkit-flex",flexDirection:"row",height:30,alignItems:"center",marginTop:5}}>
+                    <span className="commentAuthor"> {this.props.comment.author} </span>
+
+                    <div onClick={this.setFavorited}
+                         style={{display:"flex",display:"-webkit-flex",flexDirection:"row",alignItems:"center"}}>
+                        <div className={this.state.favorited ?"commentZan_push":"commentZan"}></div>
+                        <div className="commentZan_1">{this.state.favorites} </div>
+                    </div>
+                </div>
+                <span className="commentTime">{this.getShowTime(this.props.comment.time)}</span>
+                <span className="commentText">{this.props.comment.content}</span>
+
+                <div className={this.props.comment.replyContent ?"commentReplyLine":"commentLine"}/>
+                {reply}
             </div>
         );
     }
@@ -342,7 +391,7 @@ function getScrollTop() {
         scrollTop = document.body.scrollTop;
     }
     return scrollTop;
-};
+}
 
 //获取当前可是范围的高度
 function getClientHeight() {
@@ -354,12 +403,12 @@ function getClientHeight() {
         clientHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight);
     }
     return clientHeight;
-};
+}
 
 //获取文档完整的高度
 function getScrollHeight() {
     return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-};
+}
 
 window.onload = function () {
     if (document.getElementById('detail_comment')) {
