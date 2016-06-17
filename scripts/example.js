@@ -333,20 +333,6 @@ var CommentForm = React.createClass({
     }
 });
 
-window.onload = function () {
-    if (document.getElementById('detail_comment')) {
-        ReactDOM.render(
-            <CommentBox />,
-            document.getElementById('detail_comment')
-        );
-    } else if (document.getElementById('comment_list')) {
-        ReactDOM.render(
-            <CommentBox2 />,
-            document.getElementById('comment_list')
-        );
-    }
-};
-
 function getScrollTop() {
     var scrollTop = 0;
     if (document.documentElement && document.documentElement.scrollTop) {
@@ -375,4 +361,16 @@ function getScrollHeight() {
     return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
 };
 
-
+window.onload = function () {
+    if (document.getElementById('detail_comment')) {
+        ReactDOM.render(
+            <CommentBox />,
+            document.getElementById('detail_comment')
+        );
+    } else if (document.getElementById('comment_list')) {
+        ReactDOM.render(
+            <CommentBox2 />,
+            document.getElementById('comment_list')
+        );
+    }
+};
