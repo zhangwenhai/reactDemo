@@ -180,7 +180,7 @@ var CommentBox2 = React.createClass({
         console.log(comment.text);
         console.log(document.cookie);
         document.cookie = "auth-uid=1";
-        document.cookie = "auth-token=52e95cfe45ac48388b59124cf823d288";
+        document.cookie = "auth-token=a87c89f9d0b0448ca7fb72a9a8604134";
         var strCookie = document.cookie;
         var arrCookie = strCookie.split("; ");
         var auth_uid;
@@ -267,10 +267,10 @@ var Comment = React.createClass({
         if (this.props.date.getTime() - time < 24 * 60 * 60 * 1000) {
             return parseInt((this.props.date.getTime() - time) / 1000 / 60 / 60) + "小时之前";
         }
-        var DD = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
+        var DD = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
         var HH = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
         var MM = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-        return date.getMonth() + "月" + DD + "日  " + HH + ":" + MM;
+        return date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + DD + "日  " + HH + ":" + MM;
     },
 
     setFavorited: function () {
