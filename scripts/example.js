@@ -15,6 +15,30 @@ import 'whatwg-fetch';
 import "../css/comment";
 
 var CommentBox = React.createClass({
+    getLoginInfo: function () {
+        //document.cookie = "auth-uid=1";
+        //document.cookie = "auth-token=52e95cfe45ac48388b59124cf823d288";
+        var strCookie = document.cookie;
+        var arrCookie = strCookie.split("; ");
+        this.auth_uid = "-1";
+        this.auth_token = "-1";
+        for (var i = 0; i < arrCookie.length; i++) {
+            var arr = arrCookie[i].split("=");
+            if ("auth-uid" == arr[0]) {
+                this.auth_uid = arr[1];
+            } else if ("auth-token" == arr[0]) {
+                this.auth_token = arr[1];
+            }
+        }
+        console.log(this.auth_uid);
+        console.log(this.auth_token);
+        if (this.auth_uid == "-1" || this.auth_token == "-1") {
+            this.isLogin = false;
+        } else {
+            this.isLogin = true;
+        }
+    },
+
     loadCommentsFromServer: function () {
         fetch(this.url, {
             method: 'POST',
@@ -42,36 +66,21 @@ var CommentBox = React.createClass({
     },
 
     handleCommentSubmit: function (comment) {
-        console.log(comment.text);
-        console.log(document.cookie);
-        document.cookie = "auth-uid=1";
-        document.cookie = "auth-token=52e95cfe45ac48388b59124cf823d288";
-        var strCookie = document.cookie;
-        var arrCookie = strCookie.split("; ");
-        var auth_uid;
-        var auth_token;
-        for (var i = 0; i < arrCookie.length; i++) {
-            var arr = arrCookie[i].split("=");
-            if ("auth-uid" == arr[0]) {
-                auth_uid = arr[1];
-            } else if ("auth-token" == arr[0]) {
-                auth_token = arr[1];
-            }
-        }
-        console.log(auth_uid);
-        console.log(auth_token);
         fetch(this.CommentSubmiturl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                "auth-uid": auth_uid,
-                "auth-token": auth_token,
+                "auth-uid": this.auth_uid,
+                "auth-token": this.auth_token,
             },
             body: "content=" + comment.text,
         })
             .then((response) => response.json())
             .then((responseData) => {
                 console.log(responseData);
+                if (responseData.code == 20101) {
+                    alert("登录过期，请重新登录")
+                }
             })
             .catch(error => {
             });
@@ -82,32 +91,72 @@ var CommentBox = React.createClass({
     },
 
     componentDidMount: function () {
+        this.getLoginInfo();
         this.getUrlParam();
         this.loadCommentsFromServer();
     },
 
     render: function () {
-        return (
-            <div className="commentBox">
-                <div className="commentLine"/>
-                <span className="commentHead">评论: {this.state.data.commentCount}</span>
+        if (this.isLogin) {
+            return (
+                <div className="commentBox">
+                    <div className="commentLine"/>
+                    <span className="commentHead">评论: {this.state.data.commentCount}</span>
 
-                <div className="commentLine"/>
+                    <div className="commentLine"/>
 
-                <div className="commentHead_1"></div>
-                <CommentList data={this.state.data.comments}/>
+                    <div className="commentHead_1"></div>
+                    <CommentList data={this.state.data.comments}/>
 
-                <span className="commentFoot" onClick={this.getUrlParam1}>查看全部评论</span>
+                    <span className="commentFoot" onClick={this.getUrlParam1}>查看全部评论</span>
 
-                <div style={{width:"100%",height:54}}></div>
-                <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
-                <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
-            </div>
-        );
+                    <div style={{width:"100%",height:54}}></div>
+                    <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
+                    <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+                </div>
+            );
+        } else {
+            return (
+                <div className="commentBox">
+                    <div className="commentLine"/>
+                    <span className="commentHead">评论: {this.state.data.commentCount}</span>
+
+                    <div className="commentLine"/>
+
+                    <div className="commentHead_1"></div>
+                    <CommentList data={this.state.data.comments}/>
+
+                    <span className="commentFoot" onClick={this.getUrlParam1}>查看全部评论</span>
+                </div>
+            );
+        }
     }
 });
 
 var CommentBox2 = React.createClass({
+    getLoginInfo: function () {
+        //document.cookie = "auth-uid=1";
+        //document.cookie = "auth-token=52e95cfe45ac48388b59124cf823d288";
+        var strCookie = document.cookie;
+        var arrCookie = strCookie.split("; ");
+        this.auth_uid = "-1";
+        this.auth_token = "-1";
+        for (var i = 0; i < arrCookie.length; i++) {
+            var arr = arrCookie[i].split("=");
+            if ("auth-uid" == arr[0]) {
+                this.auth_uid = arr[1];
+            } else if ("auth-token" == arr[0]) {
+                this.auth_token = arr[1];
+            }
+        }
+        console.log(this.auth_uid);
+        console.log(this.auth_token);
+        if (this.auth_uid == "-1" || this.auth_token == "-1") {
+            this.isLogin = false;
+        } else {
+            this.isLogin = true;
+        }
+    },
     getInitialState: function () {
         return {data: []};
     },
@@ -115,6 +164,7 @@ var CommentBox2 = React.createClass({
     componentDidMount: function () {
         this.pageNum = 1;
         this.isEnd = false;
+        this.getLoginInfo();
         this.loadCommentsFromServer();
         window.onscroll = function () {
             if (getScrollTop() + getClientHeight() == getScrollHeight()) {
@@ -177,52 +227,46 @@ var CommentBox2 = React.createClass({
     },
 
     handleCommentSubmit: function (comment) {
-        console.log(comment.text);
-        console.log(document.cookie);
-        document.cookie = "auth-uid=1";
-        document.cookie = "auth-token=a87c89f9d0b0448ca7fb72a9a8604134";
-        var strCookie = document.cookie;
-        var arrCookie = strCookie.split("; ");
-        var auth_uid;
-        var auth_token;
-        for (var i = 0; i < arrCookie.length; i++) {
-            var arr = arrCookie[i].split("=");
-            if ("auth-uid" == arr[0]) {
-                auth_uid = arr[1];
-            } else if ("auth-token" == arr[0]) {
-                auth_token = arr[1];
-            }
-        }
-        console.log(auth_uid);
-        console.log(auth_token);
         fetch(this.CommentSubmiturl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                "auth-uid": auth_uid,
-                "auth-token": auth_token
+                "auth-uid": this.auth_uid,
+                "auth-token": this.auth_token
             },
             body: "content=" + comment.text
         })
             .then((response) => response.json())
             .then((responseData) => {
-                alert(responseData.data);
-                this.loadCommentsFromServer();
+                console.log(responseData);
+                if (responseData.code == 20101) {
+                    alert("登录过期，请重新登录")
+                } else {
+                    this.loadCommentsFromServer();
+                }
             })
             .catch(error => {
             });
     },
 
     render: function () {
-        return (
-            <div className="commentBox">
-                <CommentList data={this.state.data}/>
+        if (this.isLogin) {
+            return (
+                <div className="commentBox">
+                    <CommentList data={this.state.data}/>
 
-                <div style={{width:"100%",height:54}}></div>
-                <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
-                <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
-            </div>
-        );
+                    <div style={{width:"100%",height:54}}></div>
+                    <div className="commentLine" style={{position:"fixed",bottom:55,border:0}}></div>
+                    <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+                </div>
+            );
+        } else {
+            return (
+                <div className="commentBox">
+                    <CommentList data={this.state.data}/>
+                </div>
+            );
+        }
     }
 });
 
@@ -375,7 +419,7 @@ var CommentForm = React.createClass({
                            placeholder="Say something..."
                            value={this.state.text}
                            onChange={this.handleTextChange}/>
-                    <input className="commentPost" type="submit" value="Post"/>
+                    <input className="commentPost" type="submit" value="发送"/>
                 </div>
             </form>
         );

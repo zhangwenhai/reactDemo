@@ -173,17 +173,38 @@ br {
     margin: 0 10px 0 10px;
     padding: 0 0 0 5px;
     height: 30px;
-    border-width: 0;
     flex: 1;
     font-size: 1.0em;
+    border-radius: 5px;
+    border: 1px solid #E9E9E9;
+    -webkit-appearance: none;
 }
 
 .commentPost {
+    -webkit-appearance: none;
     margin: 0 10px 0 0;
     padding: 0 0 0 0;
     height: 30px;
-    text-align: right;
+    text-align: center;
     width: 50px;
+    border-radius: 5px;
+    border: 1px solid #E9E9E9;
+    background-color: #39A8F7;
+    color: #FFFFFF;
+    font-size: 1.0em;
+}
+
+.commentPost:active {
+    margin: 0 10px 0 0;
+    padding: 0 0 0 0;
+    height: 30px;
+    text-align: center;
+    width: 50px;
+    border-radius: 5px;
+    border: 1px solid #E9E9E9;
+    background-color: #1b62f7;
+    color: #FFFFFF;
+    font-size: 1.0em;
 }
 
 .commentZan {
